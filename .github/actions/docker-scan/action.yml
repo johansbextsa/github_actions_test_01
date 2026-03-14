@@ -8,7 +8,9 @@ runs:
   using: composite
   steps:
     - name: Print image
+      shell: bash
       run: echo "Scanning ${{ inputs.image }}"
     - name: Run trivy scan
+      shell: bash
       run: |
         docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasecurity/trivy:latest image --exit-code 1 --severity HIGH,CRITICAL ${{ inputs.image }}

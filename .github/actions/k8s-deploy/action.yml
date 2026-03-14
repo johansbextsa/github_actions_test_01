@@ -1,0 +1,22 @@
+name: Kubernetes deploy
+description: Deploy prebuilt image to Kubernetes using kubeconfig from secret
+inputs:
+  kubeconfig:
+    description: Base64 encoded kubeconfig content
+    required: true
+  manifest:
+    description: Path to kubernetes manifest file
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v5
+      with:
+        version: 'latest'
+    - name: Write kubeconfig
+      run: |
+        echo "${{ inputs.kubeconfig }}" | base64 --decode > $HOME/.kube/config
+    - name: Deploy manifest
+      run: |
+        kubectl apply -f ${{ inputs.manifest }}

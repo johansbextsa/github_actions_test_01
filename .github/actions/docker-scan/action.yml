@@ -1,0 +1,14 @@
+name: Docker vulnerability scan
+description: Scan a local Docker image with Trivy
+inputs:
+  image:
+    description: Docker image name to scan
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Print image
+      run: echo "Scanning ${{ inputs.image }}"
+    - name: Run trivy scan
+      run: |
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasecurity/trivy:latest image --exit-code 1 --severity HIGH,CRITICAL ${{ inputs.image }}

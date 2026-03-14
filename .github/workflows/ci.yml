@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16, 20]
+        node-version: [20]
 
     steps:
       - uses: actions/checkout@v4
@@ -33,10 +33,26 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t simple-landing-node:latest .
-      - name: Save Docker image as artifact
+      - name: Scan Docker image for vulnerabilities
+        uses: ./.github/actions/docker-scan
+        with:
+          image: simple-landing-node:latest
+      - name: Save Docker image artifact
         run: |
           docker save simple-landing-node:latest -o app-image.tar
       - uses: actions/upload-artifact@v4
         with:
           name: app-image
           path: app-image.tar
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Kubernetes
+        uses: ./.github/actions/k8s-deploy
+        with:
+          kubeconfig: ${{ secrets.KUBE_CONFIG_DATA }}
+          manifest: k8s/deployment.yaml

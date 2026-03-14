@@ -18,7 +18,7 @@ describe('API Endpoints', () => {
 
   it('GET /readiness should return status ready', async () => {
     const res = await request(app).get('/readiness');
-    assert.strictEqual(res.status, 500);
+    assert.strictEqual(res.status, 200);
     assert.deepStrictEqual(res.body, { status: 'ready' });
   });
 
